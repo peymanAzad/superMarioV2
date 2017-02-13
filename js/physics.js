@@ -18,9 +18,9 @@ var box2d;
     box2d = {
         scale:30,
         init: function () {
-            var gravity = new b2Vec2(0, 9.8);
-            var alowSleep = true;
-            box2d.world = new b2World(gravity, alowSleep);
+            var gravity = new b2Vec2(0,9.8);
+            var allowSleep = true;
+            box2d.world = new b2World(gravity,allowSleep);
 
             var debugContext = document.getElementById('debugCanvas').getContext('2d');
             var debugDraw = new b2DebugDraw();
@@ -33,27 +33,33 @@ var box2d;
         },
         step: function (elapcedTime) {
             box2d.world.Step(elapcedTime, 8, 3);
-            box2d.world.ClearForces();
-            box2d.world.DrawDebugData();
         },
         createRectangle: function (entity, definition) {
-            var bodydef = new b2BodyDef();
-            if(entity.isStatic) bodydef.type = b2Body.b2_staticBody;
-            else bodydef.type = b2Body.b2_dynamicBody;
-            bodydef.position.x = entity.x/box2d.scale;
-            bodydef.position.y = entity.y/box2d.scale;
-            if(entity.angle) bodydef.angle = Math.PI * entity.angle / 180;
+            var bodyDef = new b2BodyDef;
+            if(entity.isStatic){
+                bodyDef.type = b2Body.b2_staticBody;
+            } else {
+                bodyDef.type = b2Body.b2_dynamicBody;
+            }
 
-            var fixtureDef = new b2FixtureDef();
+            bodyDef.position.x = (entity.x + entity.width/2)/box2d.scale;
+            bodyDef.position.y = (entity.y + entity.height/2)/box2d.scale;
+            if (entity.angle) {
+                bodyDef.angle = Math.PI*entity.angle/180;
+            }
+
+            var fixtureDef = new b2FixtureDef;
             fixtureDef.density = definition.density;
             fixtureDef.friction = definition.friction;
             fixtureDef.restitution = definition.restitution;
-            fixtureDef.shape = new b2PolygonShape();
-            fixtureDef.shape.SetAsBox(entity.width/2/box2d.scale, entity.height/2/box2d.scale);
 
-            var body = box2d.world.CreateBody(bodydef);
+            fixtureDef.shape = new b2PolygonShape;
+            fixtureDef.shape.SetAsBox(entity.width/2/box2d.scale,entity.height/2/box2d.scale);
+
+            var body = box2d.world.CreateBody(bodyDef);
             body.SetUserData(entity);
-            body.CreateFixture(fixtureDef);
+
+            var fixture = body.CreateFixture(fixtureDef);
             return body;
         },
         createCircle: function (entity, definition) {

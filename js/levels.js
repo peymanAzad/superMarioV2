@@ -5,7 +5,7 @@ var levels = {
     data: [
         {
             entities:[
-                {type:"ground", name:"dirt", x:20,y:300,width:600,height:300,isStatic:true},
+                {type:"ground", name:"dirt",x:30,y:300,width:500,height:200,isStatic:true},
                 // {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
                 //
                 // {type:"block", name:"wood", x:520,y:380,angle:90,width:100,height:25},

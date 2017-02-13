@@ -33,7 +33,6 @@ var game = {
         loader.init();
     },
     animate: function () {
-        pixi.render();
         var currentTime = new Date().getTime();
         var timeStep;
         if (game.lastUpdateTime){
@@ -44,7 +43,29 @@ var game = {
             box2d.step(timeStep);
         }
         game.lastUpdateTime = currentTime;
+        game.drawSprite();
+
+        game.updateSprites();
+        game.drawSprite();
+
         game.animationFrame = window.requestAnimationFrame(game.animate);
+    },
+    updateSprites: function () {
+        for (var body = box2d.world.GetBodyList(); body; body = body.GetNext()) {
+            var entity = body.GetUserData();
+            if(entity){
+                var position = body.GetPosition();
+                var angle = body.GetAngle();
+                var sprite = body.sprite;
+                sprite.x = (position.x * box2d.scale) - entity.width/2;
+                sprite.y = (position.y * box2d.scale) - entity.height/2;
+                sprite.rotate = angle;
+            }
+        }
+    },
+    drawSprite: function () {
+        pixi.render();
+        box2d.world.DrawDebugData();
     }
 };
 
