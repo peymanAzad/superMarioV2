@@ -25,8 +25,9 @@ var entities = {
         var definition = entities.definitions[entity.name];
         switch(entity.type){
             case "ground":
+                var sprite = pixi.createGroundSprite(entity, definition);
+                entity.sprite = sprite;
                 box2d.createRectangle(entity, definition);
-                pixi.createGroundSprite(entity, definition);
                 break;
         }
     }
