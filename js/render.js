@@ -20,6 +20,10 @@ var pixi;
             pixi.renderer.view.style.border = "1px solid black";
             pixi.renderer.backgroundColor = "0xFFFFFF";
 
+            pixi.backgroundContainer = new Container();
+            pixi.backgroundContainer.cacheAsBitmap = true;
+            pixi.stage.addChild(pixi.backgroundContainer);
+
             pixi.gameContainer = new Container();
             pixi.stage.addChild(pixi.gameContainer);
 
@@ -69,6 +73,17 @@ var pixi;
             ground.height = e.height;
             pixi.gameContainer.addChild(ground);
             return ground;
+        },
+        createBackground: function (data) {
+            var loc = entities.definitions.backgrounds.colors[data.color];
+            var colorSprite = pixi.helpers.createTilingSprite("img/spritesheet.png", loc, 0, 0, 800, 600);
+            pixi.backgroundContainer.addChild(colorSprite);
+
+            data.particles.forEach(function(e){
+                var loc = entities.definitions.backgrounds.particles[e.name][e.type];
+                var sprite = pixi.helpers.frame("img/spritesheet.png", loc, e.x, e.y);
+                pixi.backgroundContainer.addChild(sprite);
+            });
         },
         helpers: {
             createTilingSprite: function (source, loc, x, y, width, height) {

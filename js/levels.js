@@ -4,6 +4,15 @@
 var levels = {
     data: [
         {
+            background: {
+                color: "blue",
+                particles:[
+                    {name:"clouds", type:1, x:100, y:20},
+                    {name:"clouds", type:0, x:300, y:70},
+                    {name:"clouds", type:2, x:500, y:50},
+                    {name:"clouds", type:2, x:700, y:35}
+                ]
+            },
             entities:[
                 {type:"ground", name:"dirt",x:30,y:350,width:600,height:250,isStatic:true},
                 // {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
@@ -22,6 +31,7 @@ var levels = {
         }
     ],
     load: function (number) {
+        pixi.createBackground(levels.data[number].background);
         var entitiess = levels.data[number].entities;
         entitiess.forEach(function(e){
             entities.create(e);

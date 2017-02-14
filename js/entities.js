@@ -3,6 +3,18 @@
  */
 var entities = {
     definitions: {
+        "backgrounds":{
+            colors:{
+                "blue": {top:295, left:519, width:33, height:30 }
+            },
+            particles:{
+                "clouds":[
+                    {top:38, left:621, width:48, height:24},
+                    {top:38, left:671, width:64, height:24},
+                    {top:38, left:738, width:31, height:24}
+                ]
+            }
+        },
         "dirt":{
             density:3.0,
             friction:1.5,

@@ -10,4 +10,4 @@ var loader = {
         levels.load(0);
         game.animate();
     }
-}
+};

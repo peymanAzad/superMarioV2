@@ -57,10 +57,8 @@ var game = {
                 var position = body.GetPosition();
                 var angle = body.GetAngle();
                 var sprite = entity.sprite;
-                sprite.anchor.x = 0.5;
-                sprite.anchor.y = 0.5;
-                sprite.x = (position.x * box2d.scale);
-                sprite.y = (position.y * box2d.scale);
+                sprite.x = (position.x * box2d.scale) - entity.width/2;
+                sprite.y = (position.y * box2d.scale) - entity.height/2;
                 sprite.rotation = angle;
             }
         }
