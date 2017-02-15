@@ -8,13 +8,14 @@ var levels = {
                 color: "blue",
                 particles:[
                     {name:"clouds", type:1, x:100, y:20},
-                    {name:"clouds", type:0, x:300, y:70},
+                    {name:"clouds", type:0, x:300, y:50},
                     {name:"clouds", type:2, x:500, y:50},
                     {name:"clouds", type:2, x:700, y:35}
                 ]
             },
             entities:[
-                {type:"ground", name:"dirt",x:30,y:350,width:600,height:250,isStatic:true},
+                {type:"ground", name:"dirt",x:30,y:400,width:600,height:200,isStatic:true},
+                {type:"hero", name:"superMario", x:40, y:100, width:16, height:31}
                 // {type:"ground", name:"wood", x:185,y:390,width:30,height:80,isStatic:true},
                 //
                 // {type:"block", name:"wood", x:520,y:380,angle:90,width:100,height:25},

@@ -11,7 +11,8 @@ var pixi;
         Sprite = PIXI.Sprite,
         TilingSprite = PIXI.extras.TilingSprite,
         Rectangle = PIXI.Rectangle,
-        Texture = PIXI.Texture;
+        Texture = PIXI.Texture,
+        AnimatedSprite = PIXI.extras.AnimatedSprite;
 
     pixi = {
         init: function () {
@@ -61,16 +62,12 @@ var pixi;
             var right = pixi.helpers.createTilingSprite("img/spritesheet.png", loc, e.width - loc.width, def.types.surface.right.height,
                     loc.width, e.height - def.types.surface.right.height);
 
-            ground.addChild(topLeft);
-            ground.addChild(topRight);
-            ground.addChild(surface);
-            ground.addChild(left);
-            ground.addChild(body);
-            ground.addChild(right);
+            ground.addChild(topLeft, topRight, surface, left, body, right);
 
             ground.position.set(e.x, e.y);
             ground.width = e.width;
             ground.height = e.height;
+            ground.pivot.set(e.width/2, e.height/2);
             pixi.gameContainer.addChild(ground);
             return ground;
         },
@@ -85,11 +82,43 @@ var pixi;
                 pixi.backgroundContainer.addChild(sprite);
             });
         },
+        createHeroSprite: function (entity, definition) {
+            var states = {right:{}, left:{}};
+            for(var state in definition.right){
+                states.right[state] = pixi.helpers.createAnimationSprite("img/spritesheet.png", definition.right[state], entity.x, entity.y);
+            }
+            for(var state in definition.left){
+                states.left[state] = pixi.helpers.createAnimationSprite("img/spritesheet.png", definition.left[state], entity.x, entity.y);
+            }
+            var sprite = states.right.idle;
+            sprite.states = states;
+            sprite.animationSpeed = 0.1;
+            // sprite.scale.set(1.5, 1.5);
+            sprite.play();
+            pixi.gameContainer.addChild(sprite);
+            sprite.anchor.set(0.5, 0.5);
+            sprite.changeState = function (vector, state) {
+                var current = game.hero.GetUserData().sprite;
+                var sprite = current.states[vector][state];
+                sprite.animationSpeed = current.animationSpeed;
+                sprite.position = current.position;
+                sprite.anchor = current.anchor;
+                sprite.routation = current.routation;
+                if(sprite.textures.length >1) sprite.play();
+                pixi.gameContainer.removeChild(current);
+                pixi.gameContainer.addChild(sprite);
+                sprite.states = current.states;
+                sprite.changeState = current.changeState;
+                game.hero.GetUserData().sprite = sprite;
+            };
+            setTimeout(function () {
+                sprite.changeState("right", "run");
+            }, 3000);
+            return sprite;
+        },
         helpers: {
             createTilingSprite: function (source, loc, x, y, width, height) {
-                var texture = new Texture(TextureCache[source]);
-                var frm = new Rectangle(loc.left, loc.top, loc.width, loc.height);
-                texture.frame = frm;
+                var texture = pixi.helpers.createTexture(source, loc);
                 var sprite = new TilingSprite(
                     texture, width, height
                 );
@@ -97,12 +126,30 @@ var pixi;
                 return sprite;
             },
             frame: function (source, loc, x, y) {
-                var texture = new Texture(TextureCache[source]);
-                var frm = new Rectangle(loc.left, loc.top, loc.width, loc.height);
-                texture.frame = frm;
+                var texture = pixi.helpers.createTexture(source, loc);
                 var sprite = new Sprite(texture);
                 sprite.position.set(x, y);
                 return sprite;
+            },
+            createAnimationSprite: function(source, locArr, x, y){
+                var texures = pixi.helpers.createTextureArray(source, locArr);
+                var sprite = new AnimatedSprite(texures);
+                sprite.position.set(x, y);
+                return sprite;
+            },
+            createTextureArray: function(source, locArr){
+                var Arr = [];
+                locArr.forEach(function (e) {
+                    var texture = pixi.helpers.createTexture(source, e);
+                    Arr.push(texture);
+                });
+                return Arr;
+            },
+            createTexture: function (source, loc) {
+                var texture = new Texture(TextureCache[source]);
+                var frm = new Rectangle(loc.left, loc.top, loc.width, loc.height);
+                texture.frame = frm;
+                return texture;
             }
         }
     };
