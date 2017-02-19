@@ -46,6 +46,7 @@ var game = {
         game.drawSprite();
 
         game.updateSprites();
+        game.hero.UserUpdate();
         game.drawSprite();
 
         game.animationFrame = window.requestAnimationFrame(game.animate);

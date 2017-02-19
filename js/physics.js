@@ -14,11 +14,12 @@ var box2d;
     var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
     var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
     var b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
+    var GRAVITY = 20;
 
     box2d = {
         scale:30,
         init: function () {
-            var gravity = new b2Vec2(0,9.8);
+            var gravity = new b2Vec2(0,GRAVITY);
             var allowSleep = true;
             box2d.world = new b2World(gravity,allowSleep);
 
@@ -30,9 +31,35 @@ var box2d;
             debugDraw.SetLineThickness(1.0);
             debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
             box2d.world.SetDebugDraw(debugDraw);
+
+            var listener = new Box2D.Dynamics.b2ContactListener;
+            listener.BeginContact = function(contact){
+                if(contact.GetFixtureA().GetBody().GetUserData().type === "hero" && contact.GetFixtureA().IsSensor()){
+                    var fixtureUserData = contact.GetFixtureA().GetUserData();
+                    game.hero.UserContact[fixtureUserData].push(contact.GetFixtureB());
+                }
+                else if(contact.GetFixtureB().GetBody().GetUserData().type === "hero" && contact.GetFixtureB().IsSensor()){
+                    var fixtureUserData = contact.GetFixtureB().GetUserData();
+                    game.hero.UserContact[fixtureUserData].push(contact.GetFixtureA());
+                }
+            };
+            listener.EndContact = function (contact) {
+                if(contact.GetFixtureA().GetBody().GetUserData().type === "hero" && contact.GetFixtureA().IsSensor()){
+                    var fixtureUserData = contact.GetFixtureA().GetUserData();
+                    var index = game.hero.UserContact[fixtureUserData].indexOf(contact.GetFixtureB());
+                    game.hero.UserContact[fixtureUserData].splice(index, index+1);
+                }
+                else if(contact.GetFixtureB().GetBody().GetUserData().type === "hero" && contact.GetFixtureB().IsSensor()){
+                    var fixtureUserData = contact.GetFixtureB().GetUserData();
+                    var index = game.hero.UserContact[fixtureUserData].indexOf(contact.GetFixtureA());
+                    game.hero.UserContact[fixtureUserData].splice(index, index+1);
+                }
+            };
+            box2d.world.SetContactListener(listener);
         },
         step: function (elapcedTime) {
             box2d.world.Step(elapcedTime, 8, 3);
+            box2d.world.ClearForces();
         },
         createRectangle: function (entity, definition) {
             var bodyDef = new b2BodyDef;
@@ -80,6 +107,24 @@ var box2d;
             body.SetUserData(entity);
             body.CreateFixture(fixtureDef);
             return body;
+        },
+        addSensors: function (body, positions) {
+            positions.forEach(function(e){
+                box2d.addSensor(body, e);
+            });
+            return body;
+        },
+        addSensor: function (body, pos) {
+            var fixtureDef = new b2FixtureDef;
+
+            fixtureDef.shape = new b2PolygonShape;
+            var center = new b2Vec2(pos.x, pos.y);
+            fixtureDef.shape.SetAsOrientedBox(pos.width/2/box2d.scale, pos.height/2/box2d.scale, center, 0.0);
+            fixtureDef.isSensor = true;
+
+            var fixture = body.CreateFixture(fixtureDef);
+            fixture.SetUserData(pos.name);
+            return fixture;
         }
     }
 })();

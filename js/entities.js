@@ -72,7 +72,7 @@ var entities = {
         },
         "superMario":{
             density:3.0,
-            friction:0.0,
+            friction:0.7,
             restitution:0.0,
             right:{
                 idle:[
@@ -120,8 +120,72 @@ var entities = {
                 var sprite = pixi.createHeroSprite(entity, definition);
                 entity.sprite = sprite;
                 game.hero = box2d.createRectangle(entity, definition);
-                var vec = new Box2D.Common.Math.b2Vec2(2, 0);
-                game.hero.SetLinearVelocity(vec);
+                var sensors = [
+                    {x: 0, y: 15/30, width: 16, height: 5, name:"bottom"},
+                    {x: 0, y: -15/30, width: 16, height: 5, name:"top"},
+                    {x: -16/2/30, y: 0, width: 5, height: 31, name:"left"},
+                    {x: 16/2/30, y: 0, width: 5, height: 31, name:"right"}
+                ];
+                box2d.addSensors(game.hero, sensors);
+                game.hero.UserContact = {};
+                game.hero.UserContact.bottom = [];
+                game.hero.UserContact.top = [];
+                game.hero.UserContact.left = [];
+                game.hero.UserContact.right = [];
+                // game.hero.SetSleepingAllowed(true);
+                game.hero.SetFixedRotation(true);
+                game.hero.currentState = "idle";
+                game.hero.currentVector = "right";
+                game.hero.moveRight = function () {
+                    var vec = new Box2D.Common.Math.b2Vec2(55, 0);
+                    if(game.hero.GetLinearVelocity().x < 9) game.hero.ApplyForce(vec, game.hero.GetWorldCenter());
+                };
+                game.hero.moveLeft = function () {
+                    var vec = new Box2D.Common.Math.b2Vec2(-55, 0);
+                    if(game.hero.GetLinearVelocity().x > -9) game.hero.ApplyForce(vec, game.hero.GetWorldCenter());
+                };
+                game.hero.UserUpdate = function () {
+                    if(Key.isDown(Key.JUMP)){ if(game.hero.checkForJump()) game.hero.jump();}
+                    if (Key.isDown(Key.LEFT)) game.hero.moveLeft();
+                    else if (Key.isDown(Key.RIGHT)) game.hero.moveRight();
+
+                    game.hero.updateState();
+                    game.hero.updateSpriteState();
+                };
+                game.hero.updateSpriteState = function(){
+                    game.hero.GetUserData().sprite.changeState(game.hero.currentVector, game.hero.currentState);
+                };
+                game.hero.checkForJump = function () {
+                    var contacts = game.hero.UserContact.bottom;
+                    if(contacts.length > 0) return true;
+                    else return false;
+                };
+                game.hero.jump = function () {
+                    if(game.hero.checkForJump()){
+                        var vec = new Box2D.Common.Math.b2Vec2(game.hero.GetLinearVelocity().x, 110);
+                        game.hero.ApplyImpulse(vec, game.hero.GetWorldCenter());
+                    }
+                };
+                game.hero.updateState = function () {
+                    if(game.hero.UserContact.bottom.length > 0){
+                        if (Key.isDown(Key.JUMP)){
+                            game.hero.currentState = "jump";
+                        }
+                        else if (Key.isDown(Key.LEFT)){
+                            game.hero.currentState = "run";
+                            game.hero.currentVector = "left";
+                        }
+                        else if (Key.isDown(Key.RIGHT)){
+                            game.hero.currentState = "run";
+                            game.hero.currentVector = "right";
+                        }
+                        else{
+                            if(Math.abs(game.hero.GetLinearVelocity().x) < 0.01){
+                                game.hero.currentState = "idle";
+                            }
+                        }
+                    }
+                };
                 break;
         }
     }

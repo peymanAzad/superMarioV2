@@ -92,7 +92,7 @@ var pixi;
             }
             var sprite = states.right.idle;
             sprite.states = states;
-            sprite.animationSpeed = 0.1;
+            sprite.animationSpeed = 0.2;
             // sprite.scale.set(1.5, 1.5);
             sprite.play();
             pixi.gameContainer.addChild(sprite);
@@ -111,9 +111,6 @@ var pixi;
                 sprite.changeState = current.changeState;
                 game.hero.GetUserData().sprite = sprite;
             };
-            setTimeout(function () {
-                sprite.changeState("right", "run");
-            }, 3000);
             return sprite;
         },
         helpers: {
