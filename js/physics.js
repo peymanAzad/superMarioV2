@@ -84,7 +84,7 @@ var box2d;
             fixtureDef.shape.SetAsBox(entity.width/2/box2d.scale,entity.height/2/box2d.scale);
 
             var body = box2d.world.CreateBody(bodyDef);
-            body.SetUserData(entity);
+            body.SetUserData(entity.name);
 
             var fixture = body.CreateFixture(fixtureDef);
             return body;
