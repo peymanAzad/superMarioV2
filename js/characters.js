@@ -30,22 +30,30 @@ Hero.prototype.moveRight = function () {
 };
 Hero.prototype.moveLeft = function () {
     var vec = new Box2D.Common.Math.b2Vec2(-this.definition.horizontalForce, 0);
-    if(this.body.GetLinearVelocity().x < -this.definition.maxHorizontalVelocity)
+    if(this.body.GetLinearVelocity().x > -this.definition.maxHorizontalVelocity)
         this.body.ApplyForce(vec, this.body.GetWorldCenter());
 };
 Hero.prototype.jump = function () {
-    if(this.body.checkForJump()){
-        var vec = new Box2D.Common.Math.b2Vec2(this.body.GetLinearVelocity().x, this.definition.verticalImpulse);
-        game.hero.ApplyImpulse(vec, this.body.GetWorldCenter());
+    if(this.checkForJump()){
+        var vec = new Box2D.Common.Math.b2Vec2(0, -this.definition.verticalImpulse);
+        game.hero.body.ApplyImpulse(vec, this.body.GetWorldCenter());
     }
 };
-Hero.prototype.update = function () {
+Hero.prototype.updateMovement = function () {
     if(Key.isDown(Key.JUMP)){ if(this.checkForJump()) this.jump();}
     if (Key.isDown(Key.LEFT)) this.moveLeft();
     else if (Key.isDown(Key.RIGHT)) this.moveRight();
 
     this.updateState();
     this.updateSpriteState();
+};
+Hero.prototype.updatePosition = function () {
+    var position = this.body.GetPosition();
+    var angle = this.body.GetAngle();
+    var sprite = this.sprite;
+    sprite.x = (position.x * box2d.scale);
+    sprite.y = (position.y * box2d.scale);
+    sprite.rotation = angle;
 };
 Hero.prototype.updateState = function () {
     if(this.Contacts.bottom.length > 0){

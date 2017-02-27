@@ -67,7 +67,7 @@ var pixi;
             ground.position.set(e.x, e.y);
             ground.width = e.width;
             ground.height = e.height;
-            ground.pivot.set(e.width/2, e.height/2);
+
             pixi.gameContainer.addChild(ground);
             return ground;
         },
@@ -98,7 +98,7 @@ var pixi;
             pixi.gameContainer.addChild(sprite);
             sprite.anchor.set(0.5, 0.5);
             sprite.changeState = function (vector, state) {
-                var current = game.hero.GetUserData().sprite;
+                var current = game.hero.sprite;
                 var sprite = current.states[vector][state];
                 sprite.animationSpeed = current.animationSpeed;
                 sprite.position = current.position;
@@ -109,7 +109,7 @@ var pixi;
                 pixi.gameContainer.addChild(sprite);
                 sprite.states = current.states;
                 sprite.changeState = current.changeState;
-                game.hero.GetUserData().sprite = sprite;
+                game.hero.sprite = sprite;
             };
             return sprite;
         },

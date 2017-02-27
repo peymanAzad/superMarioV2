@@ -76,7 +76,7 @@ var entities = {
             restitution:0.0,
             horizontalForce:55,
             maxHorizontalVelocity: 9,
-            verticalImpulse: 110,
+            verticalImpulse: 10,
             right:{
                 idle:[
                     {top:0, left:257, width:16, height:32}

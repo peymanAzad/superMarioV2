@@ -36,23 +36,23 @@ var box2d;
             listener.BeginContact = function(contact){
                 if(contact.GetFixtureA().GetBody().GetUserData().type === "hero" && contact.GetFixtureA().IsSensor()){
                     var fixtureUserData = contact.GetFixtureA().GetUserData();
-                    game.hero.UserContact[fixtureUserData].push(contact.GetFixtureB());
+                    game.hero.Contacts[fixtureUserData].push(contact.GetFixtureB());
                 }
                 else if(contact.GetFixtureB().GetBody().GetUserData().type === "hero" && contact.GetFixtureB().IsSensor()){
                     var fixtureUserData = contact.GetFixtureB().GetUserData();
-                    game.hero.UserContact[fixtureUserData].push(contact.GetFixtureA());
+                    game.hero.Contacts[fixtureUserData].push(contact.GetFixtureA());
                 }
             };
             listener.EndContact = function (contact) {
                 if(contact.GetFixtureA().GetBody().GetUserData().type === "hero" && contact.GetFixtureA().IsSensor()){
                     var fixtureUserData = contact.GetFixtureA().GetUserData();
-                    var index = game.hero.UserContact[fixtureUserData].indexOf(contact.GetFixtureB());
-                    game.hero.UserContact[fixtureUserData].splice(index, index+1);
+                    var index = game.hero.Contacts[fixtureUserData].indexOf(contact.GetFixtureB());
+                    game.hero.Contacts[fixtureUserData].splice(index, index+1);
                 }
                 else if(contact.GetFixtureB().GetBody().GetUserData().type === "hero" && contact.GetFixtureB().IsSensor()){
                     var fixtureUserData = contact.GetFixtureB().GetUserData();
-                    var index = game.hero.UserContact[fixtureUserData].indexOf(contact.GetFixtureA());
-                    game.hero.UserContact[fixtureUserData].splice(index, index+1);
+                    var index = game.hero.Contacts[fixtureUserData].indexOf(contact.GetFixtureA());
+                    game.hero.Contacts[fixtureUserData].splice(index, index+1);
                 }
             };
             box2d.world.SetContactListener(listener);
@@ -84,7 +84,7 @@ var box2d;
             fixtureDef.shape.SetAsBox(entity.width/2/box2d.scale,entity.height/2/box2d.scale);
 
             var body = box2d.world.CreateBody(bodyDef);
-            body.SetUserData(entity.name);
+            body.SetUserData(entity);
 
             var fixture = body.CreateFixture(fixtureDef);
             return body;
