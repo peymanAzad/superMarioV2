@@ -73,8 +73,9 @@ var pixi;
         },
         createBackground: function (data) {
             var loc = entities.definitions.backgrounds.colors[data.color];
-            var colorSprite = pixi.helpers.createTilingSprite("img/spritesheet.png", loc, 0, 0, 800, 600);
+            var colorSprite = pixi.helpers.createTilingSprite("img/spritesheet.png", loc, 0, 0, data.width, pixi.renderer.height);
             pixi.backgroundContainer.addChild(colorSprite);
+            pixi.backgroundContainer.width = data.width;
 
             data.particles.forEach(function(e){
                 var loc = entities.definitions.backgrounds.particles[e.name][e.type];
@@ -95,7 +96,6 @@ var pixi;
             sprite.animationSpeed = 0.2;
             // sprite.scale.set(1.5, 1.5);
             sprite.play();
-            pixi.gameContainer.addChild(sprite);
             sprite.anchor.set(0.5, 0.5);
             sprite.changeState = function (vector, state) {
                 var current = game.hero.sprite;
@@ -105,12 +105,13 @@ var pixi;
                 sprite.anchor = current.anchor;
                 sprite.routation = current.routation;
                 if(sprite.textures.length >1) sprite.play();
-                pixi.gameContainer.removeChild(current);
-                pixi.gameContainer.addChild(sprite);
+                pixi.stage.removeChild(current);
+                pixi.stage.addChild(sprite);
                 sprite.states = current.states;
                 sprite.changeState = current.changeState;
                 game.hero.sprite = sprite;
             };
+            pixi.stage.addChild(sprite);
             return sprite;
         },
         helpers: {
@@ -147,6 +148,13 @@ var pixi;
                 var frm = new Rectangle(loc.left, loc.top, loc.width, loc.height);
                 texture.frame = frm;
                 return texture;
+            }
+        },
+        camera: {
+            defaultParallaxSpeed: 0.4,
+            panToX: function (x) {
+                pixi.gameContainer.position.x = -x;
+                pixi.backgroundContainer.position.x = -(x*pixi.camera.defaultParallaxSpeed);
             }
         }
     };

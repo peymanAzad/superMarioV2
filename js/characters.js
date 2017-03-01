@@ -50,10 +50,10 @@ Hero.prototype.updateMovement = function () {
 Hero.prototype.updatePosition = function () {
     var position = this.body.GetPosition();
     var angle = this.body.GetAngle();
-    var sprite = this.sprite;
-    sprite.x = (position.x * box2d.scale);
-    sprite.y = (position.y * box2d.scale);
-    sprite.rotation = angle;
+    if(game.cameraPanningMode.x) pixi.camera.panToX((position.x * box2d.scale)-pixi.renderer.width/2);
+    else this.sprite.position.x = (position.x * box2d.scale)+pixi.gameContainer.position.x;
+    this.sprite.position.y = position.y * box2d.scale;
+    this.sprite.rotation = angle;
 };
 Hero.prototype.updateState = function () {
     if(this.Contacts.bottom.length > 0){

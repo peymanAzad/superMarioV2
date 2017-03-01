@@ -11,7 +11,7 @@
     }
 
     if (!window.requestAnimationFrame)
-        window.requestAnimationFrame = function(callback, element) {
+        window.requestAnimationFrame = function(callback) {
             var currTime = new Date().getTime();
             var timeToCall = Math.max(0, 16 - (currTime - lastTime));
             var id = window.setTimeout(function() { callback(currTime + timeToCall); },
@@ -27,6 +27,7 @@
 }());
 
 var game = {
+    cameraPanningMode: {x: false, y: false},
     init: function () {
         box2d.init();
         pixi.init();
@@ -43,6 +44,8 @@ var game = {
             box2d.step(timeStep);
         }
         game.lastUpdateTime = currentTime;
+        game.checkPanning();
+
         game.drawSprite();
 
         game.updateSprites();
@@ -58,6 +61,13 @@ var game = {
     drawSprite: function () {
         pixi.render();
         box2d.world.DrawDebugData();
+    },
+    checkPanning: function(){
+        var width = pixi.renderer.width/2;
+        var height = pixi.renderer.height /2;
+        if(game.hero.body.GetPosition().x * box2d.scale > width && game.hero.body.GetPosition().x * box2d.scale < pixi.backgroundContainer.width - width)
+            game.cameraPanningMode.x = true;
+        else game.cameraPanningMode.x = false;
     }
 };
 
