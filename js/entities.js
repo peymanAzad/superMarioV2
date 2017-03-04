@@ -109,6 +109,19 @@ var entities = {
                     {top:10, left:219, width:16, height:22}
                 ]
             }
+        },
+        theAngry:{
+            density:1.0,
+            friction:0.0,
+            restitution:0.0,
+            HorizontalVelocity: 5,
+            center: {
+                run: [
+                    {top: 186, left: 310-16, width: 16, height: 16},
+                    {top: 186, left: 329-16, width: 16, height: 16}
+                ],
+                pushed: [{top: 194, left: 291-16, width: 16, height: 8}]
+            }
         }
     },
     create: function (entity) {
@@ -121,6 +134,9 @@ var entities = {
                 break;
             case "hero":
                 game.hero = new Hero(entity, definition);
+                break;
+            case "enemy":
+                game.enemies.push(new enemy(entity, definition));
                 break;
         }
     }

@@ -7,10 +7,10 @@ function Hero(entity, definition){
     this.entity = entity;
     this.definition = definition;
     this.sensors = [
-        {x: 0, y: entity.height/2/box2d.scale, width: entity.width, height: 5, name:"bottom"},
-        {x: 0, y: -entity.height/2/box2d.scale, width: entity.width, height: 5, name:"top"},
-        {x: -entity.width/2/box2d.scale, y: 0, width: 5, height: entity.height, name:"left"},
-        {x: entity.width/2/box2d.scale, y: 0, width: 5, height: entity.height, name:"right"}
+        {x: 0, y: entity.height/2/box2d.scale, width: entity.width-5, height: 3, name:"bottom"},
+        {x: 0, y: -entity.height/2/box2d.scale, width: entity.width-5, height: 3, name:"top"},
+        {x: -entity.width/2/box2d.scale, y: 0, width: 3, height: entity.height-3, name:"left"},
+        {x: entity.width/2/box2d.scale, y: 0, width: 3, height: entity.height-3, name:"right"}
     ];
     this.currentState = "idle";
     this.currentVector = "right";
@@ -84,4 +84,38 @@ Hero.prototype.checkForJump = function () {
 };
 Hero.prototype.createSensors = function () {
     box2d.addSensors(this.body, this.sensors);
+};
+
+function enemy(entity, definition){
+    this.entity = entity;
+    this.definition = definition;
+    this.sprite = pixi.createEnemy(entity, definition);
+    this.body = box2d.createRectangle(entity, definition);
+    this.body.SetUserData(this);
+    this.currentState = "run";
+    this.currentVector = definition.center ? "center" : "right";
+    this.body.SetFixedRotation(true);
+}
+enemy.prototype.push = function () {
+    this.sprite = this.sprite.changeState(this.currentVector, "pushed", this.sprite);
+    this.sprite.position.y += (this.entity.height - this.sprite.height)/4;
+    box2d.world.DestroyBody(this.body);
+    this.pushed = true;
+};
+enemy.prototype.updatePosition = function () {
+    if(this.pushed){
+        if(this.sprite.alpha > 0) this.sprite.alpha -= 0.005;
+        else{
+            this.sprite.alpha = 0.0;
+            this.sprite.destroy(true);
+            this.died = true;
+        }
+    }
+    else {
+        var position = this.body.GetPosition();
+        var angle = this.body.GetAngle();
+        this.sprite.position.x = (position.x * box2d.scale);
+        this.sprite.position.y = position.y * box2d.scale;
+        this.sprite.rotation = angle;
+    }
 };

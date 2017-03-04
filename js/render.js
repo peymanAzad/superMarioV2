@@ -114,6 +114,46 @@ var pixi;
             pixi.stage.addChild(sprite);
             return sprite;
         },
+        createEnemy: function (entity, definition) {
+            var states = {};
+            var sprite;
+            if(definition.center) {
+                states.center = {};
+                for(var state in definition.center) {
+                    states.center[state] = pixi.helpers.createAnimationSprite("img/spritesheet.png", definition.center[state], entity.x, entity.y);
+                }
+                sprite = states.center.run;
+            }
+            else{
+                states = {right:{}, left:{}};
+                for(var state in definition.left) {
+                    states.left[state] = pixi.helpers.createAnimationSprite("img/spritesheet.png", definition.left[state], entity.x, entity.y);
+                }
+                for(var state in definition.right) {
+                    states.right[state] = pixi.helpers.createAnimationSprite("img/spritesheet.png", definition.right[state], entity.x, entity.y);
+                }
+                sprite = states.right.run;
+            }
+            sprite.states = states;
+            sprite.animationSpeed = 0.05;
+            sprite.play();
+            sprite.anchor.set(0.5, 0.5);
+            sprite.changeState = function (vector, state, current) {
+                var sprite = current.states[vector][state];
+                sprite.animationSpeed = current.animationSpeed;
+                sprite.position = current.position;
+                sprite.anchor = current.anchor;
+                sprite.routation = current.routation;
+                if(sprite.textures.length >1) sprite.play();
+                pixi.gameContainer.removeChild(current);
+                pixi.gameContainer.addChild(sprite);
+                sprite.states = current.states;
+                sprite.changeState = current.changeState;
+                return sprite;
+            };
+            pixi.gameContainer.addChild(sprite);
+            return sprite;
+        },
         helpers: {
             createTilingSprite: function (source, loc, x, y, width, height) {
                 var texture = pixi.helpers.createTexture(source, loc);
@@ -145,8 +185,7 @@ var pixi;
             },
             createTexture: function (source, loc) {
                 var texture = new Texture(TextureCache[source]);
-                var frm = new Rectangle(loc.left, loc.top, loc.width, loc.height);
-                texture.frame = frm;
+                texture.frame = new Rectangle(loc.left, loc.top, loc.width, loc.height);
                 return texture;
             }
         },

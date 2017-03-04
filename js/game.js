@@ -28,6 +28,7 @@
 
 var game = {
     cameraPanningMode: {x: false, y: false},
+    enemies: [],
     init: function () {
         box2d.init();
         pixi.init();
@@ -52,11 +53,16 @@ var game = {
 
         game.drawSprite();
 
+        game.handleHeroCollisions();
+
         game.animationFrame = window.requestAnimationFrame(game.animate);
     },
     updateSprites: function () {
         game.hero.updatePosition();
         game.hero.updateMovement();
+        game.enemies.forEach(function (e) {
+            if(!e.died) e.updatePosition();
+        });
     },
     drawSprite: function () {
         pixi.render();
@@ -65,9 +71,19 @@ var game = {
     checkPanning: function(){
         var width = pixi.renderer.width/2;
         var height = pixi.renderer.height /2;
-        if(game.hero.body.GetPosition().x * box2d.scale > width && game.hero.body.GetPosition().x * box2d.scale < pixi.backgroundContainer.width - width)
-            game.cameraPanningMode.x = true;
-        else game.cameraPanningMode.x = false;
+        game.cameraPanningMode.x = game.hero.body.GetPosition().x * box2d.scale > width && game.hero.body.GetPosition().x * box2d.scale < pixi.backgroundContainer.width - width;
+    },
+    handleHeroCollisions: function () {
+        game.hero.Contacts.bottom.forEach(function (e) {
+            if(e.GetBody().GetUserData().push) {
+                var v = game.hero.body.GetLinearVelocity();
+                v.y = -5;
+                game.hero.body.SetLinearVelocity(v);
+                setTimeout(function () {
+                    e.GetBody().GetUserData().push();
+                },30);
+            }
+        });
     }
 };
 
