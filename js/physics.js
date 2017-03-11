@@ -14,12 +14,12 @@ var box2d;
     var b2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
     var b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
     var b2RevoluteJointDef = Box2D.Dynamics.Joints.b2RevoluteJointDef;
-    var GRAVITY = 20;
 
     box2d = {
+        gravity: 50,
         scale:30,
         init: function () {
-            var gravity = new b2Vec2(0,GRAVITY);
+            var gravity = new b2Vec2(0,box2d.gravity);
             var allowSleep = true;
             box2d.world = new b2World(gravity,allowSleep);
 

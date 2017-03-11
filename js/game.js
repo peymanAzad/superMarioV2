@@ -74,14 +74,29 @@ var game = {
         game.cameraPanningMode.x = game.hero.body.GetPosition().x * box2d.scale > width && game.hero.body.GetPosition().x * box2d.scale < pixi.backgroundContainer.width - width;
     },
     handleHeroCollisions: function () {
+        var flag = false;
         game.hero.Contacts.bottom.forEach(function (e) {
             if(e.GetBody().GetUserData().push) {
+                flag = true;
                 var v = game.hero.body.GetLinearVelocity();
-                v.y = -5;
+                v.y = -8;
                 game.hero.body.SetLinearVelocity(v);
                 setTimeout(function () {
                     e.GetBody().GetUserData().push();
                 },30);
+            }
+        });
+        if(flag) return;
+        game.hero.Contacts.left.forEach(function(e){
+            if(e.GetBody().GetUserData().entity.type === "enemy"){
+                if(!game.hero.died) game.hero.die();
+                e.GetBody().SetLinearVelocity(new Box2D.Common.Math.b2Vec2(0, 0));
+            }
+        });
+        game.hero.Contacts.right.forEach(function(e){
+            if(e.GetBody().GetUserData().entity.type === "enemy"){
+                if(!game.hero.died) game.hero.die();
+                e.GetBody().SetLinearVelocity(new Box2D.Common.Math.b2Vec2(0, 0));
             }
         });
     }

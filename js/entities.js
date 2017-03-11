@@ -72,11 +72,11 @@ var entities = {
         },
         "superMario":{
             density:3.0,
-            friction:0.7,
+            friction:0.1,
             restitution:0.0,
-            horizontalForce:55,
+            horizontalForce:box2d.gravity * 1.7,
             maxHorizontalVelocity: 9,
-            verticalImpulse: 10,
+            verticalImpulse: box2d.gravity * 0.4,
             right:{
                 idle:[
                     {top:0, left:257, width:16, height:32}
@@ -91,6 +91,9 @@ var entities = {
                 ],
                 down:[
                     {top:10, left:176, width:16, height:22}
+                ],
+                lose:[
+                    {top:45-15, left:485, width:14, height:30}
                 ]
             },
             left:{
@@ -107,20 +110,23 @@ var entities = {
                 ],
                 down:[
                     {top:10, left:219, width:16, height:22}
+                ],
+                lose:[
+                    {top:45-15, left:12, width:14, height:30}
                 ]
             }
         },
-        theAngry:{
+        "theAngry":{
             density:1.0,
             friction:0.0,
             restitution:0.0,
             HorizontalVelocity: 5,
             center: {
                 run: [
-                    {top: 186, left: 310-16, width: 16, height: 16},
-                    {top: 186, left: 329-16, width: 16, height: 16}
+                    {top: 186, left: 294, width: 16, height: 16},
+                    {top: 186, left: 313, width: 16, height: 16}
                 ],
-                pushed: [{top: 194, left: 291-16, width: 16, height: 8}]
+                pushed: [{top: 194, left: 275, width: 16, height: 8}]
             }
         }
     },

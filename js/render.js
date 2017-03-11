@@ -100,6 +100,7 @@ var pixi;
             sprite.changeState = function (vector, state) {
                 var current = game.hero.sprite;
                 var sprite = current.states[vector][state];
+                sprite.position.y +=  current.height - sprite.height;
                 sprite.animationSpeed = current.animationSpeed;
                 sprite.position = current.position;
                 sprite.anchor = current.anchor;
@@ -149,6 +150,7 @@ var pixi;
                 pixi.gameContainer.addChild(sprite);
                 sprite.states = current.states;
                 sprite.changeState = current.changeState;
+
                 return sprite;
             };
             pixi.gameContainer.addChild(sprite);

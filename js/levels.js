@@ -17,7 +17,8 @@ var levels = {
             entities:[
                 {type:"ground", name:"dirt",x:30,y:400,width:1000,height:200,isStatic:true},
                 {type:"hero", name:"superMario", x:40, y:100, width:16, height:31},
-                {type:"enemy", name:"theAngry", x:100, y:200, width:16, height:16}
+                {type:"enemy", name:"theAngry", x:100, y:300, width:16, height:16, vX:5},
+                {type:"enemy", name:"theAngry", x:600, y:300, width:16, height:16, vX:-5}
             ]
         }
     ],
