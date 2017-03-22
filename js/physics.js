@@ -34,25 +34,33 @@ var box2d;
 
             var listener = new Box2D.Dynamics.b2ContactListener;
             listener.BeginContact = function(contact){
-                if(contact.GetFixtureA().GetBody().GetUserData().type === "hero" && contact.GetFixtureA().IsSensor()){
-                    var fixtureUserData = contact.GetFixtureA().GetUserData();
-                    game.hero.Contacts[fixtureUserData].push(contact.GetFixtureB());
+                var fixtureA = contact.GetFixtureA(), fixtureB = contact.GetFixtureB();
+                var typeA = fixtureA.GetBody().GetUserData().type, typeB = fixtureB.GetBody().GetUserData().type;
+                if((typeA === "hero" || typeA === "enemy") && fixtureA.IsSensor()){
+                    var fixtureUserData = fixtureA.GetUserData();
+                    var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
+                    character.Contacts[fixtureUserData].push(fixtureB);
                 }
-                else if(contact.GetFixtureB().GetBody().GetUserData().type === "hero" && contact.GetFixtureB().IsSensor()){
-                    var fixtureUserData = contact.GetFixtureB().GetUserData();
-                    game.hero.Contacts[fixtureUserData].push(contact.GetFixtureA());
+                else if((typeB === "hero" || typeB === "enemy") && fixtureB.IsSensor()){
+                    var fixtureUserData = fixtureB.GetUserData();
+                    var character = typeB === "hero" ? game.hero : fixtureB.GetBody().GetUserData();
+                    character.Contacts[fixtureUserData].push(fixtureA);
                 }
             };
             listener.EndContact = function (contact) {
-                if(contact.GetFixtureA().GetBody().GetUserData().type === "hero" && contact.GetFixtureA().IsSensor()){
-                    var fixtureUserData = contact.GetFixtureA().GetUserData();
-                    var index = game.hero.Contacts[fixtureUserData].indexOf(contact.GetFixtureB());
-                    game.hero.Contacts[fixtureUserData].splice(index, index+1);
+                var fixtureA = contact.GetFixtureA(), fixtureB = contact.GetFixtureB();
+                var typeA = fixtureA.GetBody().GetUserData().type, typeB = fixtureB.GetBody().GetUserData().type;
+                if((typeA === "hero" || typeA === "enemy") && fixtureA.IsSensor()){
+                    var fixtureUserData = fixtureA.GetUserData();
+                    var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
+                    var index = character.Contacts[fixtureUserData].indexOf(contact.GetFixtureB());
+                    character.Contacts[fixtureUserData].splice(index, index+1);
                 }
-                else if(contact.GetFixtureB().GetBody().GetUserData().type === "hero" && contact.GetFixtureB().IsSensor()){
-                    var fixtureUserData = contact.GetFixtureB().GetUserData();
-                    var index = game.hero.Contacts[fixtureUserData].indexOf(contact.GetFixtureA());
-                    game.hero.Contacts[fixtureUserData].splice(index, index+1);
+                else if((typeB === "hero" || typeB === "enemy") && fixtureB.IsSensor()){
+                    var fixtureUserData = fixtureB.GetUserData();
+                    var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
+                    var index = character.Contacts[fixtureUserData].indexOf(contact.GetFixtureA());
+                    character.Contacts[fixtureUserData].splice(index, index+1);
                 }
             };
             box2d.world.SetContactListener(listener);
@@ -109,10 +117,11 @@ var box2d;
             return body;
         },
         addSensors: function (body, positions) {
+            var sensors = [];
             positions.forEach(function(e){
-                box2d.addSensor(body, e);
+                sensors.push(box2d.addSensor(body, e));
             });
-            return body;
+            return sensors;
         },
         addSensor: function (body, pos) {
             var fixtureDef = new b2FixtureDef;

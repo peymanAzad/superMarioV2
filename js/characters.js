@@ -102,7 +102,7 @@ Hero.prototype.die = function () {
         }
     }, 1000);
 };
-
+//*********************************************************************************************enemy
 function enemy(entity, definition){
     this.entity = entity;
     this.definition = definition;
@@ -113,6 +113,15 @@ function enemy(entity, definition){
     this.currentVector = definition.center ? "center" : "right";
     this.body.SetFixedRotation(true);
     this.type = "enemy";
+    this.Contacts = {};
+    this.Contacts.left = [];
+    this.Contacts.right = [];
+
+    this.sensorsDef = [
+        {x: -entity.width/2/box2d.scale, y: 0, width: 3, height: entity.height/2, name:"left"},
+        {x: entity.width/2/box2d.scale, y: 0, width: 3, height: entity.height/2, name:"right"}
+    ];
+    this.sensors = box2d.addSensors(this.body, this.sensorsDef);
 
     if(entity.vX) this.body.SetLinearVelocity(new Box2D.Common.Math.b2Vec2(entity.vX, 0));
 }
@@ -137,5 +146,21 @@ enemy.prototype.updatePosition = function () {
         this.sprite.position.x = (position.x * box2d.scale);
         this.sprite.position.y = position.y * box2d.scale;
         this.sprite.rotation = angle;
+    }
+    this.updateContacts();
+};
+enemy.prototype.updateContacts = function () {
+    var self = this;
+    for(s in this.Contacts){
+        this.Contacts[s].forEach(function(e){
+            var type = e.GetBody().GetUserData().type;
+            if(type === "enemy" || type === "wall"){
+                var v = self.definition.HorizontalVelocity;
+                if(s == "right") v = -v;
+                var ve = self.body.GetLinearVelocity();
+                ve.x = v;
+                self.body.SetLinearVelocity(ve);
+            }
+        });
     }
 };
