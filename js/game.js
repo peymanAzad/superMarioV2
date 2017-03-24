@@ -61,7 +61,7 @@ var game = {
         game.hero.updatePosition();
         game.hero.updateMovement();
         game.enemies.forEach(function (e) {
-            if(!e.died) e.updatePosition();
+            if(!e.died) e.update();
         });
     },
     drawSprite: function () {
@@ -75,15 +75,16 @@ var game = {
     },
     handleHeroCollisions: function () {
         var flag = false;
-        game.hero.Contacts.bottom.forEach(function (e) {
+        game.hero.Contacts.bottom.forEach(function (e, i, a) {
             if(e.GetBody().GetUserData().push) {
                 flag = true;
                 var v = game.hero.body.GetLinearVelocity();
                 v.y = -8;
                 game.hero.body.SetLinearVelocity(v);
-                setTimeout(function () {
+                a.splice(i, 1);
+                // setTimeout(function () {
                     e.GetBody().GetUserData().push();
-                },30);
+                // },100);
             }
         });
         if(flag) return;

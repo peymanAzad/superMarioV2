@@ -1,6 +1,17 @@
 /**
  * Created by Peyman! on 2/26/2017.
  */
+var __extends = (this && this.__extends) || (function () {
+        var extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return function (d, b) {
+            extendStatics(d, b);
+            function __() { this.constructor = d; }
+            d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+    })();
+
 function Hero(entity, definition){
     this.sprite = pixi.createHeroSprite(entity, definition);
     this.body = box2d.createRectangle(entity, definition);
@@ -110,7 +121,7 @@ function enemy(entity, definition){
     this.body = box2d.createRectangle(entity, definition);
     this.body.SetUserData(this);
     this.currentState = "run";
-    this.currentVector = definition.center ? "center" : "right";
+    this.currentVector = definition.center ? "center" : "left";
     this.body.SetFixedRotation(true);
     this.type = "enemy";
     this.Contacts = {};
@@ -131,21 +142,34 @@ enemy.prototype.push = function () {
     box2d.world.DestroyBody(this.body);
     this.pushed = true;
 };
-enemy.prototype.updatePosition = function () {
-    if(this.pushed){
-        if(this.sprite.alpha > 0) this.sprite.alpha -= 0.005;
-        else{
-            this.sprite.alpha = 0.0;
-            this.sprite.destroy(true);
-            this.died = true;
-        }
+enemy.prototype.die1 = function(){
+    if(this.sprite.alpha > 0) this.sprite.alpha -= 0.005;
+    else{
+        this.sprite.alpha = 0.0;
+        this.sprite.destroy(true);
+        this.died = true;
     }
-    else {
-        var position = this.body.GetPosition();
-        var angle = this.body.GetAngle();
-        this.sprite.position.x = (position.x * box2d.scale);
-        this.sprite.position.y = position.y * box2d.scale;
-        this.sprite.rotation = angle;
+};
+enemy.prototype.update = function(){
+    if(this.pushed) this.die1();
+    else this.updatePosition();
+};
+enemy.prototype.updatePosition = function () {
+    var position = this.body.GetPosition();
+    var angle = this.body.GetAngle();
+    this.sprite.position.x = (position.x * box2d.scale);
+    this.sprite.position.y = position.y * box2d.scale;
+    this.sprite.rotation = angle;
+    if(!this.definition.center && !this.pushed){
+        var v = this.body.GetLinearVelocity().x;
+        if(this.currentVector !== "right" && v > 0){
+            this.sprite = this.sprite.changeState("right", this.currentState, this.sprite);
+            this.currentVector = "right";
+        }
+        else if(this.currentVector !== "left" && v < 0){
+            this.sprite = this.sprite.changeState("left", this.currentState, this.sprite);
+            this.currentVector = "left";
+        }
     }
     this.updateContacts();
 };
@@ -161,6 +185,43 @@ enemy.prototype.updateContacts = function () {
                 ve.x = v;
                 self.body.SetLinearVelocity(ve);
             }
+            // else if(type === "hero"){
+            //     var V = self.body.GetLinearVelocity();
+            //     V.x = 0.0;
+            //     self.body.SetLinearVelocity(V);
+            // }
         });
     }
 };
+
+var turtle = (function (_super) {
+    __extends(turtle, _super);
+    function turtle(definition, entity) {
+        this.pushed = 0;
+        return _super.call(this, definition, entity) || this;
+    }
+    turtle.prototype.push = function(){
+
+        this.sprite.position.y += (this.entity.height - this.sprite.height) / 4;
+        if(this.pushed >= 1) {
+            this.sprite = this.sprite.changeState(this.currentVector, "pushed2", this.sprite);
+            var V = this.body.GetLinearVelocity();
+            V.x = this.entity.vXMax;
+            var heroX = game.hero.body.GetPosition().x;
+            var thisX = this.body.GetPosition().x;
+            if(thisX > heroX) V.x *= -1;
+            this.body.SetLinearVelocity(V);
+        }else{
+            this.sprite = this.sprite.changeState(this.currentVector, "pushed", this.sprite);
+            //noinspection JSDuplicatedDeclaration
+            var V = this.body.GetLinearVelocity();
+            V.x = 0.0;
+            this.body.SetLinearVelocity(V);
+        }
+        ++this.pushed;
+    };
+    turtle.prototype.update = function(){
+        this.updatePosition();
+    };
+    return turtle;
+}(enemy));

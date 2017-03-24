@@ -48,19 +48,23 @@ var box2d;
                 }
             };
             listener.EndContact = function (contact) {
-                var fixtureA = contact.GetFixtureA(), fixtureB = contact.GetFixtureB();
-                var typeA = fixtureA.GetBody().GetUserData().type, typeB = fixtureB.GetBody().GetUserData().type;
-                if((typeA === "hero" || typeA === "enemy") && fixtureA.IsSensor()){
-                    var fixtureUserData = fixtureA.GetUserData();
-                    var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
-                    var index = character.Contacts[fixtureUserData].indexOf(contact.GetFixtureB());
-                    character.Contacts[fixtureUserData].splice(index, index+1);
-                }
-                else if((typeB === "hero" || typeB === "enemy") && fixtureB.IsSensor()){
-                    var fixtureUserData = fixtureB.GetUserData();
-                    var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
-                    var index = character.Contacts[fixtureUserData].indexOf(contact.GetFixtureA());
-                    character.Contacts[fixtureUserData].splice(index, index+1);
+                try {
+                    var fixtureA = contact.GetFixtureA(), fixtureB = contact.GetFixtureB();
+                    var typeA = fixtureA.GetBody().GetUserData().type, typeB = fixtureB.GetBody().GetUserData().type;
+                    if ((typeA === "hero" || typeA === "enemy") && fixtureA.IsSensor()) {
+                        var fixtureUserData = fixtureA.GetUserData();
+                        var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
+                        var index = character.Contacts[fixtureUserData].indexOf(contact.GetFixtureB());
+                        character.Contacts[fixtureUserData].splice(index, index + 1);
+                    }
+                    else if ((typeB === "hero" || typeB === "enemy") && fixtureB.IsSensor()) {
+                        var fixtureUserData = fixtureB.GetUserData();
+                        var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
+                        var index = character.Contacts[fixtureUserData].indexOf(contact.GetFixtureA());
+                        character.Contacts[fixtureUserData].splice(index, index + 1);
+                    }
+                }catch(e){
+
                 }
             };
             box2d.world.SetContactListener(listener);

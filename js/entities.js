@@ -128,6 +128,44 @@ var entities = {
                 ],
                 pushed: [{top: 194, left: 275, width: 16, height: 8}]
             }
+        },
+        "turtle":{
+            density:1.0,
+            friction:0.0,
+            restitution:0.0,
+            HorizontalVelocity: 5,
+            right: {
+                run: [
+                    {top: 208, left: 257, width: 16, height: 21},
+                    {top: 207, left: 277, width: 15, height: 22},
+                    {top: 208, left: 295, width: 16, height: 21},
+                    {top: 207, left: 315, width: 15, height: 22}
+                ],
+                pushed2: [
+                    {top: 214, left: 334, width: 14, height: 15},
+                    {top: 217, left: 353, width: 14, height: 12}
+                ],
+                pushed:[
+                    {top: 214, left: 163, width: 14, height: 15},
+                    {top: 215, left: 144, width: 14, height: 12}
+                ]
+            },
+            left: {
+                run: [
+                    {top: 208, left: 238, width: 16, height: 21},
+                    {top: 207, left: 219, width: 15, height: 22},
+                    {top: 208, left: 200, width: 16, height: 21},
+                    {top: 207, left: 181, width: 15, height: 22}
+                ],
+                pushed2: [
+                    {top: 214, left: 334, width: 14, height: 15},
+                    {top: 217, left: 353, width: 14, height: 12}
+                ],
+                pushed: [
+                    {top: 214, left: 163, width: 14, height: 15},
+                    {top: 215, left: 144, width: 14, height: 12}
+                ]
+            }
         }
     },
     create: function (entity) {
@@ -142,7 +180,16 @@ var entities = {
                 game.hero = new Hero(entity, definition);
                 break;
             case "enemy":
-                game.enemies.push(new enemy(entity, definition));
+                var Enemy;
+                switch(entity.name){
+                    case "theAngry":
+                        Enemy = new enemy(entity, definition);
+                        break;
+                    case "turtle":
+                        Enemy = new turtle(entity, definition);
+                        break;
+                }
+                game.enemies.push(Enemy);
                 break;
         }
     }

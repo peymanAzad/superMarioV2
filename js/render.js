@@ -133,7 +133,8 @@ var pixi;
                 for(var state in definition.right) {
                     states.right[state] = pixi.helpers.createAnimationSprite("img/spritesheet.png", definition.right[state], entity.x, entity.y);
                 }
-                sprite = states.right.run;
+                var vector = definition.vX > 0 ? "right" : "left";
+                sprite = states[vector].run;
             }
             sprite.states = states;
             sprite.animationSpeed = 0.05;
