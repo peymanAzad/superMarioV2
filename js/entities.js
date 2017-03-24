@@ -120,7 +120,7 @@ var entities = {
             density:1.0,
             friction:0.0,
             restitution:0.0,
-            HorizontalVelocity: 5,
+            HorizontalVelocity: 2,
             center: {
                 run: [
                     {top: 186, left: 294, width: 16, height: 16},
@@ -133,7 +133,7 @@ var entities = {
             density:1.0,
             friction:0.0,
             restitution:0.0,
-            HorizontalVelocity: 5,
+            HorizontalVelocity: 2,
             right: {
                 run: [
                     {top: 208, left: 257, width: 16, height: 21},
@@ -166,7 +166,14 @@ var entities = {
                     {top: 215, left: 144, width: 14, height: 12}
                 ]
             }
+        },
+        brick:{
+            density:3.0,
+            friction:1.5,
+            restitution:0.2,
+            top:171, left:519, width:16, height:16
         }
+
     },
     create: function (entity) {
         var definition = entities.definitions[entity.name];
@@ -191,6 +198,14 @@ var entities = {
                 }
                 game.enemies.push(Enemy);
                 break;
+            case "wall":
+                switch(entity.name){
+                    case "brick":
+                        var sprite = pixi.createBrick(entity, definition);
+                        entity.sprite = sprite;
+                        box2d.createRectangle(entity, definition);
+                        break;
+                }
         }
     }
 };

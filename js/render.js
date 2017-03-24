@@ -157,6 +157,12 @@ var pixi;
             pixi.gameContainer.addChild(sprite);
             return sprite;
         },
+        createBrick: function(entity, definition){
+            var sprite = pixi.helpers.createTilingSprite(
+                "img/spritesheet.png", definition, entity.x, entity.y, entity.width, entity.height);
+            pixi.gameContainer.addChild(sprite);
+            return sprite;
+        },
         helpers: {
             createTilingSprite: function (source, loc, x, y, width, height) {
                 var texture = pixi.helpers.createTexture(source, loc);

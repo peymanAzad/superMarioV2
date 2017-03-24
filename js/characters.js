@@ -18,8 +18,8 @@ function Hero(entity, definition){
     this.entity = entity;
     this.definition = definition;
     this.sensors = [
-        {x: 0, y: entity.height/2/box2d.scale, width: entity.width-5, height: 3, name:"bottom"},
-        {x: 0, y: -entity.height/2/box2d.scale, width: entity.width-5, height: 3, name:"top"},
+        {x: 0, y: entity.height/2/box2d.scale, width: entity.width, height: 3, name:"bottom"},
+        {x: 0, y: -entity.height/2/box2d.scale, width: entity.width, height: 3, name:"top"},
         {x: -entity.width/2/box2d.scale, y: 0, width: 3, height: entity.height/2, name:"left"},
         {x: entity.width/2/box2d.scale, y: 0, width: 3, height: entity.height/2, name:"right"}
     ];
@@ -160,30 +160,31 @@ enemy.prototype.updatePosition = function () {
     this.sprite.position.x = (position.x * box2d.scale);
     this.sprite.position.y = position.y * box2d.scale;
     this.sprite.rotation = angle;
+    var v = this.body.GetLinearVelocity().x;
     if(!this.definition.center && !this.pushed){
-        var v = this.body.GetLinearVelocity().x;
         if(this.currentVector !== "right" && v > 0){
             this.sprite = this.sprite.changeState("right", this.currentState, this.sprite);
-            this.currentVector = "right";
         }
         else if(this.currentVector !== "left" && v < 0){
             this.sprite = this.sprite.changeState("left", this.currentState, this.sprite);
-            this.currentVector = "left";
         }
     }
+    if(v > 0) this.currentVector = "right";
+    else if(v < 0) this.currentVector = "left";
     this.updateContacts();
 };
 enemy.prototype.updateContacts = function () {
     var self = this;
     for(s in this.Contacts){
-        this.Contacts[s].forEach(function(e){
+        this.Contacts[s].forEach(function(e, i, a){
             var type = e.GetBody().GetUserData().type;
             if(type === "enemy" || type === "wall"){
-                var v = self.definition.HorizontalVelocity;
-                if(s == "right") v = -v;
+                var v = self.pushed > 1 ? Math.abs(self.entity.vXMax) : Math.abs(self.entity.vX);
+                if(s == "right") v = -Math.abs(v);
                 var ve = self.body.GetLinearVelocity();
                 ve.x = v;
                 self.body.SetLinearVelocity(ve);
+                a.splice(i, 1);
             }
             // else if(type === "hero"){
             //     var V = self.body.GetLinearVelocity();
