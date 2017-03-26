@@ -35,31 +35,33 @@ var box2d;
             var listener = new Box2D.Dynamics.b2ContactListener;
             listener.BeginContact = function(contact){
                 var fixtureA = contact.GetFixtureA(), fixtureB = contact.GetFixtureB();
-                var typeA = fixtureA.GetBody().GetUserData().type, typeB = fixtureB.GetBody().GetUserData().type;
-                if((typeA === "hero" || typeA === "enemy") && fixtureA.IsSensor()){
+                var dataA = fixtureA.GetBody().GetUserData(), dataB = fixtureB.GetBody().GetUserData();
+                var typeA = dataA.type, typeB = dataB.type;
+                if((typeA === "hero" || typeA === "enemy" || typeA === "wallBrick") && fixtureA.IsSensor()){
                     var fixtureUserData = fixtureA.GetUserData();
-                    var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
+                    var character = typeA === "hero" ? game.hero : dataA;
                     character.Contacts[fixtureUserData].push(fixtureB);
                 }
-                else if((typeB === "hero" || typeB === "enemy") && fixtureB.IsSensor()){
+                else if((typeB === "hero" || typeB === "enemy" || typeB === "wallBrick") && fixtureB.IsSensor()){
                     var fixtureUserData = fixtureB.GetUserData();
-                    var character = typeB === "hero" ? game.hero : fixtureB.GetBody().GetUserData();
+                    var character = typeB === "hero" ? game.hero : dataB;
                     character.Contacts[fixtureUserData].push(fixtureA);
                 }
             };
             listener.EndContact = function (contact) {
                 try {
                     var fixtureA = contact.GetFixtureA(), fixtureB = contact.GetFixtureB();
-                    var typeA = fixtureA.GetBody().GetUserData().type, typeB = fixtureB.GetBody().GetUserData().type;
-                    if ((typeA === "hero" || typeA === "enemy") && fixtureA.IsSensor()) {
+                    var dataA = fixtureA.GetBody().GetUserData(), dataB = fixtureB.GetBody().GetUserData();
+                    var typeA = dataA.type, typeB = dataB.type;
+                    if ((typeA === "hero" || typeA === "enemy" || typeA === "wallBrick") && fixtureA.IsSensor()) {
                         var fixtureUserData = fixtureA.GetUserData();
-                        var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
+                        var character = typeA === "hero" ? game.hero : dataA;
                         var index = character.Contacts[fixtureUserData].indexOf(contact.GetFixtureB());
                         character.Contacts[fixtureUserData].splice(index, index + 1);
                     }
-                    else if ((typeB === "hero" || typeB === "enemy") && fixtureB.IsSensor()) {
+                    else if ((typeB === "hero" || typeB === "enemy" || typeB === "wallBrick") && fixtureB.IsSensor()) {
                         var fixtureUserData = fixtureB.GetUserData();
-                        var character = typeA === "hero" ? game.hero : fixtureA.GetBody().GetUserData();
+                        var character = typeA === "hero" ? game.hero : dataB;
                         var index = character.Contacts[fixtureUserData].indexOf(contact.GetFixtureA());
                         character.Contacts[fixtureUserData].splice(index, index + 1);
                     }
@@ -139,5 +141,5 @@ var box2d;
             fixture.SetUserData(pos.name);
             return fixture;
         }
-    }
+    };
 })();

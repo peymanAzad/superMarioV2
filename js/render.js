@@ -163,6 +163,12 @@ var pixi;
             pixi.gameContainer.addChild(sprite);
             return sprite;
         },
+        createWallBrick: function (entity, definition) {
+            var sprite = pixi.helpers.frame("img/spritesheet.png", definition, entity.x+entity.width/2, entity.y+entity.height/2);
+            sprite.anchor.set(0.5, 0.5);
+            pixi.gameContainer.addChild(sprite);
+            return sprite;
+        },
         helpers: {
             createTilingSprite: function (source, loc, x, y, width, height) {
                 var texture = pixi.helpers.createTexture(source, loc);

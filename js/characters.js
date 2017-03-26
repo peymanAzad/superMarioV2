@@ -161,16 +161,18 @@ enemy.prototype.updatePosition = function () {
     this.sprite.position.y = position.y * box2d.scale;
     this.sprite.rotation = angle;
     var v = this.body.GetLinearVelocity().x;
-    if(!this.definition.center && !this.pushed){
-        if(this.currentVector !== "right" && v > 0){
-            this.sprite = this.sprite.changeState("right", this.currentState, this.sprite);
+    if (!this.definition.center) {
+        if (!this.pushed) {
+            if (this.currentVector !== "right" && v > 0) {
+                this.sprite = this.sprite.changeState("right", this.currentState, this.sprite);
+            }
+            else if (this.currentVector !== "left" && v < 0) {
+                this.sprite = this.sprite.changeState("left", this.currentState, this.sprite);
+            }
         }
-        else if(this.currentVector !== "left" && v < 0){
-            this.sprite = this.sprite.changeState("left", this.currentState, this.sprite);
-        }
+        if(v > 0) this.currentVector = "right";
+        else if(v < 0) this.currentVector = "left";
     }
-    if(v > 0) this.currentVector = "right";
-    else if(v < 0) this.currentVector = "left";
     this.updateContacts();
 };
 enemy.prototype.updateContacts = function () {
@@ -226,3 +228,82 @@ var turtle = (function (_super) {
     };
     return turtle;
 }(enemy));
+
+function wallBrick(entity, definition) {
+    this.entity = entity;
+    this.definition = definition;
+    this.Contacts = {};
+    this.Contacts.top = [];
+    this.type = "wallBrick";
+    this.state = "silent";
+
+    this.sprite = pixi.createWallBrick(entity, definition);
+
+    // entity.height -= 2;
+    // var entity2 = {type:"wall", name:"placeholder", isStatic: true};
+    // entity2.x = entity.x;
+    // entity2.y = entity.y + entity.height;
+    // entity2.width = entity.width;
+    // entity2.height = 2;
+    this.entity.width--;
+    this.body = box2d.createRectangle(entity, definition);
+    // this.placeholderBody = box2d.createRectangle(entity2, definition);
+
+    this.sensorsDef = [
+        {x: 0, y: -entity.height/2/box2d.scale, width: entity.width, height: 3, name:"top"}
+    ];
+    this.sensors = box2d.addSensors(this.body, this.sensorsDef);
+
+    this.body.SetFixedRotation(true);
+    this.body.SetUserData(this);
+    // this.placeholderBody.SetUserData(this);
+}
+wallBrick.prototype.update = function () {
+    this.updatePosition();
+    if(this.state === "tap"){
+        this.checkTapping();
+    }
+};
+wallBrick.prototype.updatePosition = function () {
+    // if(this.body.GetType() === Box2D.Dynamics.b2Body.b2_staticBody) return;
+    if(!this.body.IsAwake()){
+        this.body.SetType(Box2D.Dynamics.b2Body.b2_staticBody);
+        return;
+    }
+    var position = this.body.GetPosition();
+    var angle = this.body.GetAngle();
+    this.sprite.position.x = (position.x * box2d.scale);
+    this.sprite.position.y = position.y * box2d.scale;
+    this.sprite.rotation = angle;
+};
+wallBrick.prototype.tap = function () {
+    if(this.state === "tap") return;
+    this.body.SetType(Box2D.Dynamics.b2Body.b2_dynamicBody);
+    this.state = "tap";
+    var vec = new Box2D.Common.Math.b2Vec2(0, -this.definition.verticalImpulse);
+    this.body.ApplyImpulse(vec, this.body.GetWorldCenter());
+    this.Contacts.top.forEach(function(e, i, a){
+        var character = e.GetBody().GetUserData();
+        if(character.type === "enemy" && !(character.pushed || character.died)){
+            //character.die2();
+            a.splice(i, 1);
+        }
+    });
+};
+wallBrick.prototype.checkTapping = function () {
+    var currentPos = this.body.GetPosition();
+    var currentY = currentPos.y * box2d.scale;
+    if(currentY >= this.entity.y+this.entity.height/2){
+        this.state = "silent";
+        currentPos.y = (this.entity.y + this.entity.height/2)/box2d.scale;
+        currentPos.x = (this.entity.x + this.entity.width/2)/box2d.scale;
+        this.body.SetPosition(currentPos);
+        var ve = this.body.GetLinearVelocity();
+        ve.x = ve.y = 0.0;
+        this.body.SetLinearVelocity(ve);
+        this.body.SetType(Box2D.Dynamics.b2Body.b2_staticBody);
+    }else {
+        currentPos.x = (this.entity.x + this.entity.width/2)/box2d.scale;
+        this.body.SetPosition(currentPos);
+    }
+};

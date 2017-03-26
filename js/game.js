@@ -29,6 +29,7 @@
 var game = {
     cameraPanningMode: {x: false, y: false},
     enemies: [],
+    wallBricks: [],
     init: function () {
         box2d.init();
         pixi.init();
@@ -63,6 +64,9 @@ var game = {
         game.enemies.forEach(function (e) {
             if(!e.died) e.update();
         });
+        game.wallBricks.forEach(function (e) {
+            e.update();
+        });
     },
     drawSprite: function () {
         pixi.render();
@@ -81,27 +85,35 @@ var game = {
                 var v = game.hero.body.GetLinearVelocity();
                 v.y = -8;
                 game.hero.body.SetLinearVelocity(v);
-                a.splice(i, 1);
+                // a.splice(i, 1);
                 // setTimeout(function () {
-                    e.GetBody().GetUserData().push();
+                e.GetBody().GetUserData().push();
                 // },100);
             }
         });
         if(flag) return;
         game.hero.Contacts.left.forEach(function(e){
             if(e.GetBody().GetUserData().type === "wall") return;
-            if(e.GetBody().GetUserData().entity.type === "enemy"){
+            if(e.GetBody().GetUserData().type === "enemy"){
                 if(!game.hero.died) game.hero.die();
                 e.GetBody().SetLinearVelocity(new Box2D.Common.Math.b2Vec2(0, 0));
             }
         });
         game.hero.Contacts.right.forEach(function(e){
             if(e.GetBody().GetUserData().type === "wall") return;
-            if(e.GetBody().GetUserData().entity.type === "enemy"){
+            if(e.GetBody().GetUserData().type === "enemy"){
                 if(!game.hero.died) game.hero.die();
                 e.GetBody().SetLinearVelocity(new Box2D.Common.Math.b2Vec2(0, 0));
             }
         });
+        game.hero.Contacts.top.forEach(function(e, i, a){
+            var data = e.GetBody().GetUserData();
+            if(data.type === "wallBrick") {
+                data.tap();
+                // a.splice(i, 1);
+            }
+        });
+        game.hero.Contacts.top = [], game.hero.Contacts.right = [], game.hero.Contacts.left = [];
     }
 };
 

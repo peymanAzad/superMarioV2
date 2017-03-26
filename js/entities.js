@@ -172,8 +172,26 @@ var entities = {
             friction:1.5,
             restitution:0.2,
             top:171, left:519, width:16, height:16
+        },
+        prizeBrick:{
+            density:3.0,
+            friction:1.5,
+            restitution:0.2,
+            top:189, left:519, width:16, height:16
+        },
+        wallBrick:{
+            density:3.0,
+            friction:1.5,
+            restitution:0.2,
+            verticalImpulse:5,
+            top:131, left:519, width:16, height:17
+        },
+        noPrizeBrick:{
+            density:3.0,
+            friction:1.5,
+            restitution:0.2,
+            top:94, left:519, width:16, height:16
         }
-
     },
     create: function (entity) {
         var definition = entities.definitions[entity.name];
@@ -204,6 +222,17 @@ var entities = {
                         var sprite = pixi.createBrick(entity, definition);
                         entity.sprite = sprite;
                         box2d.createRectangle(entity, definition);
+                        break;
+                    case "wallBrick":
+                        var wallBrickWidth = definition.width;
+                        var entityWidth = entity.width;
+                        entity.width = wallBrickWidth;
+                        for(var i = 0; i < entityWidth; i += wallBrickWidth){
+                            var e = {type:"wall", name:"wallBrick", width:16, height:16, isStatic:entity.isStatic};
+                            e.x = entity.x + i;
+                            e.y = entity.y;
+                            game.wallBricks.push(new wallBrick(e, definition));
+                        }
                         break;
                 }
         }
