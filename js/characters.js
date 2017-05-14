@@ -200,32 +200,32 @@ enemy.prototype.updateContacts = function () {
 var turtle = (function (_super) {
     __extends(turtle, _super);
     function turtle(definition, entity) {
-        this.pushed = 0;
+        // this.pushed = 0;
         return _super.call(this, definition, entity) || this;
     }
-    turtle.prototype.push = function(){
-
-        this.sprite.position.y += (this.entity.height - this.sprite.height) / 4;
-        if(this.pushed >= 1) {
-            this.sprite = this.sprite.changeState(this.currentVector, "pushed2", this.sprite);
-            var V = this.body.GetLinearVelocity();
-            V.x = this.entity.vXMax;
-            var heroX = game.hero.body.GetPosition().x;
-            var thisX = this.body.GetPosition().x;
-            if(thisX > heroX) V.x *= -1;
-            this.body.SetLinearVelocity(V);
-        }else{
-            this.sprite = this.sprite.changeState(this.currentVector, "pushed", this.sprite);
-            //noinspection JSDuplicatedDeclaration
-            var V = this.body.GetLinearVelocity();
-            V.x = 0.0;
-            this.body.SetLinearVelocity(V);
-        }
-        ++this.pushed;
-    };
-    turtle.prototype.update = function(){
-        this.updatePosition();
-    };
+    // turtle.prototype.push = function(){
+    //
+    //     this.sprite.position.y += (this.entity.height - this.sprite.height) / 4;
+    //     if(this.pushed >= 1) {
+    //         this.sprite = this.sprite.changeState(this.currentVector, "pushed2", this.sprite);
+    //         var V = this.body.GetLinearVelocity();
+    //         V.x = this.entity.vXMax;
+    //         var heroX = game.hero.body.GetPosition().x;
+    //         var thisX = this.body.GetPosition().x;
+    //         if(thisX > heroX) V.x *= -1;
+    //         this.body.SetLinearVelocity(V);
+    //     }else{
+    //         this.sprite = this.sprite.changeState(this.currentVector, "pushed", this.sprite);
+    //         //noinspection JSDuplicatedDeclaration
+    //         var V = this.body.GetLinearVelocity();
+    //         V.x = 0.0;
+    //         this.body.SetLinearVelocity(V);
+    //     }
+    //     ++this.pushed;
+    // };
+    // turtle.prototype.update = function(){
+    //     this.updatePosition();
+    // };
     return turtle;
 }(enemy));
 
